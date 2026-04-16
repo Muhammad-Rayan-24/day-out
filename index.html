@@ -4,8 +4,16 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>The Perfect Lahore Day Date | Arcade & Itinerary Guide</title>
+    
+    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Chart.js for visualizations -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
+    <!-- html2canvas for downloading the itinerary as an image -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+
     <style>
         /* Essential Chart Container Styles */
         .chart-container {
@@ -40,10 +48,6 @@
             font-family: "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
             display: inline-block;
         }
-        /* Smooth transitions for hiding/showing elements */
-        .budget-element {
-            transition: opacity 0.3s ease, max-height 0.3s ease;
-        }
     </style>
     <script>
         tailwind.config = {
@@ -77,14 +81,6 @@
 </head>
 <body class="bg-neutral-50 text-neutral-800 font-sans antialiased selection:bg-brand-200 selection:text-brand-900">
 
-    <!-- Chosen Palette: Warm Neutrals & Soft Rose -->
-    <!-- Application Structure Plan: 
-         - Added dynamic state management for 'showBudgets'.
-         - Itinerary Builder completely overhauled to support N-number of steps.
-         - Integrated an auto-budgeting keyword listener for custom inputs.
-    -->
-    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
-
     <!-- Navigation -->
     <nav class="sticky top-0 z-50 bg-neutral-50/90 backdrop-blur-md border-b border-neutral-200 shadow-sm">
         <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -99,7 +95,7 @@
                     
                     <!-- Global Budget Toggle Button -->
                     <button id="btn-toggle-budget" class="bg-brand-100 hover:bg-brand-200 text-brand-800 px-4 py-2 rounded-full text-sm font-bold transition-colors flex items-center gap-2 shadow-sm border border-brand-200">
-                        <span class="icon-emoji">💰</span> <span id="budget-btn-text">Hide Budgets</span>
+                        <span class="icon-emoji">💰</span> <span id="budget-btn-text">Show Budgets</span>
                     </button>
                 </div>
             </div>
@@ -141,8 +137,8 @@
             </div>
         </section>
 
-        <!-- Section: Budget Analysis (Can be hidden globally) -->
-        <section id="budget-section" class="bg-white rounded-3xl p-8 shadow-sm border border-neutral-100 scroll-mt-24 transition-all duration-500">
+        <!-- Section: Budget Analysis (Hidden by default) -->
+        <section id="budget-section" style="display: none;" class="bg-white rounded-3xl p-8 shadow-sm border border-neutral-100 scroll-mt-24 transition-all duration-500">
             <div class="mb-8 text-center">
                 <h2 class="text-3xl font-serif font-bold text-neutral-900 mb-4">Estimated Arcade Budgets</h2>
                 <p class="text-neutral-600 max-w-2xl mx-auto">A quick comparison of expected spending for a couple.</p>
@@ -158,7 +154,7 @@
                 <div class="mb-10 text-center">
                     <span class="text-4xl icon-emoji mb-4 block">🗓️</span>
                     <h2 class="text-3xl font-serif font-bold text-neutral-900 mb-4">Custom Itinerary Builder</h2>
-                    <p class="text-neutral-700 max-w-2xl mx-auto">Build your timeline step-by-step. Add custom locations or pick from our curated list. Let the system auto-estimate your budget.</p>
+                    <p class="text-neutral-700 max-w-2xl mx-auto">Build your timeline step-by-step. Add custom locations or pick from our curated list. Everything is automatically formatted into a downloadable graphic.</p>
                 </div>
 
                 <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
@@ -185,22 +181,32 @@
 
                     <!-- Generated Result (Right/Bottom) -->
                     <div class="lg:col-span-7">
-                        <div id="itinerary-result" class="bg-white p-6 md:p-8 rounded-2xl shadow-lg border-2 border-brand-200 relative overflow-hidden transition-all duration-300 min-h-[400px]">
+                        <div class="bg-white rounded-2xl shadow-lg border-2 border-brand-200 relative overflow-hidden transition-all duration-300 min-h-[400px]">
                             <div class="absolute top-0 left-0 w-full h-2 bg-brand-400"></div>
                             
+                            <!-- Empty State -->
                             <div id="empty-state" class="text-center text-neutral-400 py-24 flex flex-col items-center justify-center h-full">
                                 <span class="text-5xl icon-emoji block mb-4 opacity-50">🗺️</span>
                                 <p class="text-lg">Add your steps on the left and click <strong>Generate</strong><br> to build your day date timeline.</p>
                             </div>
 
-                            <div id="result-content" class="hidden">
+                            <!-- Final Result Container (This specific div is captured for image download) -->
+                            <div id="result-content" class="hidden p-6 md:p-8 bg-white h-full relative">
                                 <div class="text-center mt-2 mb-8">
+                                    <span class="text-3xl icon-emoji block mb-2">👑</span>
                                     <h3 class="font-serif text-3xl font-bold text-neutral-900">Your Perfect Day</h3>
-                                    <p class="text-neutral-500 mt-2 font-medium" id="total-budget-display">Est. Total Budget: PKR 0</p>
+                                    <p class="text-neutral-500 mt-2 font-medium" id="total-budget-display" style="display: none;">Est. Total Budget: PKR 0</p>
                                 </div>
 
                                 <div class="space-y-6 relative before:absolute before:inset-0 before:ml-5 before:-translate-x-px md:before:mx-auto md:before:translate-x-0 before:h-full before:w-0.5 before:bg-gradient-to-b before:from-brand-100 before:via-brand-300 before:to-brand-100" id="timeline-container">
                                     <!-- Timeline HTML injected here -->
+                                </div>
+
+                                <!-- Action Buttons Box (Hidden during download) -->
+                                <div id="action-buttons" class="mt-10 pt-6 border-t border-neutral-100 flex justify-center">
+                                    <button onclick="downloadItinerary()" class="bg-brand-500 hover:bg-brand-600 text-white px-6 py-3 rounded-full font-bold shadow-md transition-transform hover:scale-105 flex items-center gap-2">
+                                        <span class="icon-emoji">📸</span> Save as Image
+                                    </button>
                                 </div>
                             </div>
                         </div>
@@ -221,7 +227,7 @@
     <!-- Application Logic -->
     <script>
         // --- Global State ---
-        let showBudgets = true;
+        let showBudgets = false; // Set to FALSE by default now
         let chartInstance = null;
 
         // Dynamic Itinerary State
@@ -233,25 +239,21 @@
 
         // --- Data Storage ---
         const arcadeData = [
-            { id: 'fun_factory', name: 'Fun Factory Park', location: 'Packages Mall, Walton Road', vibe: 'High Energy, Huge Variety', bestFor: 'Couples who want to act like kids again.', budgetMin: 4000, budgetMax: 8000, lat: '31.4755', lng: '74.3451', icon: '🎢' },
+            { id: 'fun_factory', name: 'Fun Factory Park', location: 'Packages Mall', vibe: 'High Energy, Huge Variety', bestFor: 'Couples who want to act like kids again.', budgetMin: 4000, budgetMax: 8000, lat: '31.4755', lng: '74.3451', icon: '🎢' },
             { id: 'uptown_la', name: 'Uptown LA', location: 'Fortress Square Mall', vibe: 'Neon, Bowling', bestFor: 'Great bowling alleys mixed with classic arcade machines.', budgetMin: 3500, budgetMax: 7000, lat: '31.5303', lng: '74.3850', icon: '🎳' },
             { id: 'transporter', name: 'Transporter VR', location: 'Gulberg III', vibe: 'Futuristic, Immersive', bestFor: 'Couples looking for something different. Co-op VR.', budgetMin: 5000, budgetMax: 9000, lat: '31.5126', lng: '74.3486', icon: '🥽' },
             { id: 'super_space', name: 'Super Space', location: 'Fortress Square Mall', vibe: 'Laser Tag, Active', bestFor: 'Competitive couples. Laser tag or bumping cars.', budgetMin: 3000, budgetMax: 6000, lat: '31.5310', lng: '74.3855', icon: '🔫' }
         ];
 
-        // Combined Locations for the dropdown
         const allLocations = {
-            // Breakfast/Morning
             english_tea: { name: 'English Tea House', cost: 4000, desc: 'Classic romantic vibe, great breakfast.', icon: '🥐' },
             rinas: { name: "Rina's Kitchenette", cost: 5000, desc: 'Modern, aesthetic interior.', icon: '☕' },
             jilani: { name: 'Jilani Park Walk', cost: 1000, desc: 'Beautiful morning walk & local chai.', icon: '🌳' },
             lahore_fort: { name: 'Lahore Fort', cost: 500, desc: 'Historic morning sightseeing.', icon: '🏛️' },
-            // Arcades (using averages for single-value cost)
             fun_factory: { name: 'Fun Factory Park', cost: 6000, desc: 'High Energy, Rides & Arcade', icon: '🎢' },
             uptown_la: { name: 'Uptown LA', cost: 5250, desc: 'Bowling & Retro Arcade', icon: '🎳' },
             transporter: { name: 'Transporter VR', cost: 7000, desc: 'Immersive VR Experience', icon: '🥽' },
             super_space: { name: 'Super Space', cost: 4500, desc: 'Laser Tag & Active Fun', icon: '🔫' },
-            // Afternoon/Wrap up
             mall_food: { name: 'Mall Food Court', cost: 3000, desc: 'Convenient post-arcade meal.', icon: '🍔' },
             mm_alam: { name: 'MM Alam Road Dining', cost: 7000, desc: 'Upscale dining to wrap up.', icon: '🍝' },
             dessert: { name: 'Dessert Spot', cost: 2500, desc: 'Light finish with ice cream or cake.', icon: '🍨' },
@@ -264,19 +266,15 @@
         function toggleBudgets() {
             showBudgets = !showBudgets;
             
-            // Update button UI
             const btnText = document.getElementById('budget-btn-text');
             btnText.innerText = showBudgets ? 'Hide Budgets' : 'Show Budgets';
             
-            // Toggle Chart Section
             const chartSec = document.getElementById('budget-section');
             chartSec.style.display = showBudgets ? 'block' : 'none';
 
-            // Re-render components to reflect visibility
             renderArcadeCards();
             renderStepsForm();
             
-            // If itinerary result is showing, regenerate it to update totals
             if(!document.getElementById('result-content').classList.contains('hidden')) {
                 generateItinerary();
             }
@@ -285,7 +283,7 @@
         // 2. Render Arcade Cards
         function renderArcadeCards() {
             const grid = document.getElementById('arcade-grid');
-            grid.innerHTML = ''; // Clear
+            grid.innerHTML = '';
             arcadeData.forEach(arcade => {
                 const card = document.createElement('div');
                 card.className = 'bg-white rounded-2xl p-6 border border-neutral-200 shadow-sm hover:shadow-lg transition-all duration-300 group';
@@ -347,8 +345,6 @@
         function renderStepsForm() {
             const container = document.getElementById('steps-container');
             container.innerHTML = '';
-            
-            // Sort keys so grouped items appear together nicely
             const locationKeys = Object.keys(allLocations);
 
             itinerarySteps.forEach((step, index) => {
@@ -365,7 +361,7 @@
                     </div>
                 ` : '';
 
-                const blockHtml = `
+                container.innerHTML += `
                     <div class="bg-neutral-50 border border-neutral-200 p-4 rounded-xl relative hover:border-brand-300 transition-colors">
                         ${itinerarySteps.length > 1 ? `
                             <button onclick="removeStep(${index})" class="absolute -top-2 -right-2 bg-red-100 hover:bg-red-200 text-red-600 rounded-full w-6 h-6 flex items-center justify-center text-sm font-bold shadow-sm transition-transform hover:scale-110" title="Remove Step">&times;</button>
@@ -398,25 +394,16 @@
                         </div>
                     </div>
                 `;
-                container.innerHTML += blockHtml;
             });
         }
 
-        // Form Handlers
         window.addStep = function() {
-            // Default time 1 hour after the last step
             let lastTime = '12:00';
             if(itinerarySteps.length > 0) {
                 lastTime = itinerarySteps[itinerarySteps.length-1].time;
             }
-            
             itinerarySteps.push({
-                id: Date.now(),
-                time: lastTime,
-                type: 'predefined',
-                locationId: 'mall_food',
-                customName: '',
-                customBudget: 0
+                id: Date.now(), time: lastTime, type: 'predefined', locationId: 'mall_food', customName: '', customBudget: 0
             });
             renderStepsForm();
         }
@@ -435,16 +422,15 @@
 
         window.updateStepType = function(index, type) {
             itinerarySteps[index].type = type;
-            renderStepsForm(); // re-render to swap input types
+            renderStepsForm(); 
         }
 
-        // Auto-Budget logic based on location keywords
         window.handleCustomNameChange = function(index, inputElem) {
             const val = inputElem.value;
             itinerarySteps[index].customName = val;
             const lowerVal = val.toLowerCase();
-            
             let suggested = 0;
+            
             if(lowerVal.includes('emporium') || lowerVal.includes('packages')) suggested = 5000;
             else if(lowerVal.includes('fortress') || lowerVal.includes('joyland')) suggested = 3500;
             else if(lowerVal.includes('mm alam')) suggested = 8000;
@@ -454,13 +440,11 @@
 
             if(suggested > 0) {
                 itinerarySteps[index].customBudget = suggested;
-                // Update input directly if it exists to prevent losing focus via full re-render
                 const budgetField = document.getElementById(`budget-input-${index}`);
                 if(budgetField) budgetField.value = suggested;
             }
         }
 
-        // Format 24h time to 12h AM/PM
         function formatTime(time24) {
             let [hours, minutes] = time24.split(':');
             hours = parseInt(hours);
@@ -472,7 +456,6 @@
 
         // 4. Generate Result Timeline
         window.generateItinerary = function() {
-            // Sort steps by time chronologically
             const sortedSteps = [...itinerarySteps].sort((a, b) => a.time.localeCompare(b.time));
             
             document.getElementById('empty-state').classList.add('hidden');
@@ -503,14 +486,14 @@
 
                 totalBudget += cost;
 
-                const budgetDisplay = showBudgets ? `<div class="text-xs font-semibold text-brand-600 bg-brand-50 px-2 py-1 rounded inline-block mt-2">Est: PKR ${cost.toLocaleString()}</div>` : '';
+                const budgetDisplay = showBudgets ? `<div class="text-xs font-semibold text-brand-600 bg-brand-50 px-2 py-1 rounded inline-block mt-2 border border-brand-100">Est: PKR ${cost.toLocaleString()}</div>` : '';
 
                 timelineContainer.innerHTML += `
                     <div class="relative flex items-center justify-between md:justify-normal md:odd:flex-row-reverse group is-active mb-6 last:mb-0">
-                        <div class="flex items-center justify-center w-12 h-12 rounded-full border-4 border-white bg-neutral-800 text-white shadow-md shrink-0 md:order-1 md:group-odd:-translate-x-1/2 md:group-even:translate-x-1/2 z-10 text-xl transform transition-transform hover:scale-110">
+                        <div class="flex items-center justify-center w-12 h-12 rounded-full border-4 border-white bg-neutral-800 text-white shadow-md shrink-0 md:order-1 md:group-odd:-translate-x-1/2 md:group-even:translate-x-1/2 z-10 text-xl">
                             ${icon}
                         </div>
-                        <div class="w-[calc(100%-4rem)] md:w-[calc(50%-3rem)] p-5 rounded-2xl border ${isCustom ? 'border-brand-200 bg-brand-50' : 'border-neutral-200 bg-white'} shadow-sm hover:shadow-md transition-shadow">
+                        <div class="w-[calc(100%-4rem)] md:w-[calc(50%-3rem)] p-5 rounded-2xl border ${isCustom ? 'border-brand-200 bg-brand-50' : 'border-neutral-200 bg-white'} shadow-sm">
                             <div class="flex items-center justify-between mb-2 border-b border-neutral-100 pb-2">
                                 <div class="font-bold text-neutral-900 text-lg">${formatTime(step.time)}</div>
                                 <div class="text-xs font-bold text-neutral-500 uppercase tracking-wider">Step ${index + 1}</div>
@@ -523,7 +506,6 @@
                 `;
             });
 
-            // Update Total Budget display
             const totalDisplay = document.getElementById('total-budget-display');
             if (showBudgets) {
                 totalDisplay.innerHTML = `Est. Total Budget: <span class="text-brand-600 font-bold">PKR ${totalBudget.toLocaleString()}</span>`;
@@ -532,16 +514,43 @@
                 totalDisplay.style.display = 'none';
             }
 
-            // Smooth scroll to result
-            if(window.innerWidth < 1024) { // Only scroll on mobile/tablet
-                document.getElementById('itinerary-result').scrollIntoView({ behavior: 'smooth', block: 'start' });
+            if(window.innerWidth < 1024) { 
+                document.getElementById('result-content').scrollIntoView({ behavior: 'smooth', block: 'start' });
             }
+        }
+
+        // 5. Download Image Logic
+        window.downloadItinerary = function() {
+            const containerToCapture = document.getElementById('result-content');
+            const actionButtons = document.getElementById('action-buttons');
+            
+            // Temporarily hide the download button so it doesn't appear in the image
+            actionButtons.style.display = 'none';
+
+            // Use html2canvas to capture the result-content div
+            html2canvas(containerToCapture, {
+                scale: 2, // 2x resolution for crisp text
+                backgroundColor: '#ffffff', // Force white background
+                useCORS: true // Handle external font/emoji rendering safely
+            }).then(canvas => {
+                // Restore the download button immediately
+                actionButtons.style.display = 'flex';
+
+                // Create a temporary link to trigger download
+                const link = document.createElement('a');
+                link.download = 'Our_Lahore_Date_Plan.png';
+                link.href = canvas.toDataURL('image/png');
+                link.click();
+            }).catch(err => {
+                console.error('Error capturing image:', err);
+                alert("Something went wrong saving the image. Please try again.");
+                actionButtons.style.display = 'flex';
+            });
         }
 
         // Initialize Chart.js
         function initChart() {
             const ctx = document.getElementById('budgetChart').getContext('2d');
-            
             const labels = arcadeData.map(a => a.name);
             const minBudgets = arcadeData.map(a => a.budgetMin);
             const maxBudgets = arcadeData.map(a => a.budgetMax);
@@ -558,13 +567,8 @@
                 options: {
                     responsive: true,
                     maintainAspectRatio: false,
-                    plugins: {
-                        legend: { position: 'top', labels: { font: { family: 'system-ui' } } }
-                    },
-                    scales: {
-                        y: { beginAtZero: true, grid: { color: '#f5f5f4' } },
-                        x: { grid: { display: false } }
-                    }
+                    plugins: { legend: { position: 'top', labels: { font: { family: 'system-ui' } } } },
+                    scales: { y: { beginAtZero: true, grid: { color: '#f5f5f4' } }, x: { grid: { display: false } } }
                 }
             });
         }
@@ -574,8 +578,6 @@
             renderArcadeCards();
             renderStepsForm();
             initChart();
-            
-            // Attach toggle event
             document.getElementById('btn-toggle-budget').addEventListener('click', toggleBudgets);
         });
 
