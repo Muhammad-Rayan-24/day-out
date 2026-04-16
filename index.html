@@ -1,0 +1,596 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Perfect Lahore Day Date | Arcade & Itinerary Guide</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        /* Essential Chart Container Styles as per requirements */
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 800px;
+            margin-left: auto;
+            margin-right: auto;
+            height: 350px;
+            max-height: 400px;
+        }
+        @media (min-width: 768px) {
+            .chart-container {
+                height: 400px;
+            }
+        }
+        /* Custom scrollbar for a polished look */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #f5f5f4; 
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #d6d3d1; 
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #a8a29e; 
+        }
+        /* Ensure emojis look uniform and act as our icons */
+        .icon-emoji {
+            font-family: "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+            display: inline-block;
+        }
+    </style>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            50: '#fff1f2',
+                            100: '#ffe4e6',
+                            200: '#fecdd3',
+                            300: '#fda4af',
+                            400: '#fb7185',
+                            500: '#f43f5e',
+                            600: '#e11d48',
+                        },
+                        neutral: {
+                            50: '#fafaf9',
+                            100: '#f5f5f4',
+                            800: '#292524',
+                            900: '#1c1917',
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['system-ui', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'Helvetica Neue', 'Arial', 'sans-serif'],
+                        serif: ['Georgia', 'Cambria', '"Times New Roman"', 'Times', 'serif'],
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="bg-neutral-50 text-neutral-800 font-sans antialiased selection:bg-brand-200 selection:text-brand-900">
+
+    <!-- Chosen Palette: Warm Neutrals & Soft Rose (Neutral 50/100 backgrounds, Brand 400/500/600 accents for a romantic, elegant feel) -->
+    
+    <!-- Application Structure Plan: 
+         1. Hero Section: Sets the mood, acknowledges the specific 9 AM - 4 PM constraint.
+         2. Time-Check Notice: Crucial context explaining that Lahore arcades generally open at 11 AM, requiring a morning activity first.
+         3. Top Arcades Gallery (Interactive): Grid of the best arcades, with click-to-reveal details (budgets, maps, coordinates) to prevent overwhelming the user immediately.
+         4. Data Visualization: A Chart.js bar chart comparing budgets across arcades to help the user plan their finances.
+         5. The 9-to-4 Itinerary Builder: An interactive tool allowing the user to select Morning, Mid-day, and Afternoon activities to generate a custom timeline and total budget.
+         6. Alternative Activities: A concise list of non-arcade ideas in case they want to pivot.
+         This structure logically moves from context -> options -> financial planning -> actionable itinerary building. 
+    -->
+
+    <!-- Visualization & Content Choices: 
+         - Arcades Info -> Goal: Compare Options -> Viz: Interactive Cards -> Interaction: Click 'View Details' to toggle info -> Justification: Keeps UI clean while offering deep data. No SVG.
+         - Budget Comparison -> Goal: Compare -> Viz: Bar Chart (Chart.js) -> Interaction: Hover tooltips -> Justification: Easiest way to visualize min vs max spending ranges. Canvas based.
+         - Itinerary Creation -> Goal: Organize/Plan -> Viz: Dynamic Timeline Builder -> Interaction: Dropdown selections update the DOM -> Justification: Solves the specific 9 AM - 4 PM puzzle the user asked for.
+    -->
+
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. Relying strictly on CSS styling and Unicode/Emojis for iconography. -->
+
+    <!-- Navigation -->
+    <nav class="sticky top-0 z-50 bg-neutral-50/90 backdrop-blur-md border-b border-neutral-200 shadow-sm">
+        <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16 items-center">
+                <div class="flex-shrink-0 flex items-center gap-2 cursor-pointer" onclick="window.scrollTo(0,0)">
+                    <span class="text-2xl icon-emoji">👑</span>
+                    <span class="font-serif font-bold text-xl text-neutral-900 tracking-tight">Royal Date Guide</span>
+                </div>
+                <div class="hidden md:flex space-x-8">
+                    <a href="#arcades" class="text-neutral-600 hover:text-brand-600 font-medium transition-colors">Top Arcades</a>
+                    <a href="#budget" class="text-neutral-600 hover:text-brand-600 font-medium transition-colors">Budget Analysis</a>
+                    <a href="#itinerary" class="text-neutral-600 hover:text-brand-600 font-medium transition-colors">Itinerary Builder</a>
+                    <a href="#alternatives" class="text-neutral-600 hover:text-brand-600 font-medium transition-colors">Alternatives</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <main class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-16">
+
+        <!-- Hero Section -->
+        <header class="text-center py-12 md:py-20 px-4 rounded-3xl bg-white shadow-sm border border-neutral-100 relative overflow-hidden">
+            <div class="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-brand-300 via-brand-500 to-brand-300"></div>
+            <span class="text-5xl icon-emoji mb-6 block">💖</span>
+            <h1 class="text-4xl md:text-5xl font-serif font-bold text-neutral-900 mb-6 leading-tight">
+                Plan the Perfect <span class="text-brand-600">Day Date</span> in Lahore
+            </h1>
+            <p class="text-lg md:text-xl text-neutral-600 max-w-2xl mx-auto mb-8">
+                Curated specifically for your <strong class="text-neutral-900">9 AM to 4 PM</strong> window. Treat your princess to a mix of romance, great food, and playful competition at Lahore's best entertainment spots.
+            </p>
+            
+            <!-- Crucial Timing Notice -->
+            <div class="inline-block bg-amber-50 border border-amber-200 text-amber-800 px-6 py-4 rounded-xl text-left shadow-sm max-w-3xl mx-auto">
+                <div class="flex items-start gap-4">
+                    <span class="text-2xl icon-emoji mt-1">⏰</span>
+                    <div>
+                        <h3 class="font-bold text-lg mb-1">Crucial Timing Note</h3>
+                        <p class="text-sm">Because arcades in Lahore are mostly located inside major malls, <strong>they do not open until 11:00 AM or 12:00 PM.</strong> For your 9 AM start, we recommend beginning with a romantic breakfast/brunch or a park stroll, then heading to the arcade around 11:30 AM.</p>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <!-- Section: Top Arcades -->
+        <section id="arcades" class="scroll-mt-24">
+            <div class="mb-10 text-center">
+                <h2 class="text-3xl font-serif font-bold text-neutral-900 mb-4">Lahore's Premium Arcades</h2>
+                <p class="text-neutral-600 max-w-2xl mx-auto">The best spots for a date, focusing on cleanliness, game variety, safety, and overall aesthetic. Click on any card to reveal budgets and exact locations.</p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6" id="arcade-grid">
+                <!-- Arcade Cards will be injected by JS -->
+            </div>
+        </section>
+
+        <!-- Section: Budget Analysis -->
+        <section id="budget" class="bg-white rounded-3xl p-8 shadow-sm border border-neutral-100 scroll-mt-24">
+            <div class="mb-8 text-center">
+                <h2 class="text-3xl font-serif font-bold text-neutral-900 mb-4">Estimated Arcade Budgets (For Two)</h2>
+                <p class="text-neutral-600 max-w-2xl mx-auto">A quick comparison of expected spending for a couple (includes game cards, a few premium rides/VR, and maybe a small snack inside the gaming zone).</p>
+            </div>
+            
+            <!-- Chart Container complying with requirements -->
+            <div class="chart-container">
+                <canvas id="budgetChart"></canvas>
+            </div>
+            <p class="text-center text-xs text-neutral-400 mt-4">*Estimates in PKR. Actual spending depends on how many games you play.</p>
+        </section>
+
+        <!-- Section: The 9-to-4 Itinerary Builder -->
+        <section id="itinerary" class="scroll-mt-24">
+            <div class="bg-brand-50 rounded-3xl p-8 md:p-12 border border-brand-100">
+                <div class="mb-10 text-center">
+                    <span class="text-4xl icon-emoji mb-4 block">🗓️</span>
+                    <h2 class="text-3xl font-serif font-bold text-neutral-900 mb-4">The 9-to-4 Master Plan</h2>
+                    <p class="text-neutral-700 max-w-2xl mx-auto">Since you have exactly 7 hours, structure is key. Build your ideal timeline below. Pick a morning start, your main event (the arcade), and how you want to wrap up.</p>
+                </div>
+
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-12">
+                    <!-- Builder Controls -->
+                    <div class="space-y-6 bg-white p-6 rounded-2xl shadow-sm border border-neutral-100">
+                        <h3 class="font-bold text-xl text-neutral-900 mb-4 border-b pb-2">Select Your Vibe</h3>
+                        
+                        <div>
+                            <label class="block text-sm font-semibold text-neutral-700 mb-2">9:00 AM - Morning Start <span class="icon-emoji">🥐</span></label>
+                            <select id="sel-morning" class="w-full bg-neutral-50 border border-neutral-300 text-neutral-900 text-sm rounded-lg focus:ring-brand-500 focus:border-brand-500 block p-3 transition-colors outline-none">
+                                <option value="english_tea">English Tea House (Classic Romantic Breakfast)</option>
+                                <option value="rinas">Rina's Kitchenette (Modern Cafe Vibe)</option>
+                                <option value="jilani">Jilani Park Walk & Local Chai (Nature & Chill)</option>
+                            </select>
+                        </div>
+
+                        <div>
+                            <label class="block text-sm font-semibold text-neutral-700 mb-2">11:30 AM - The Main Event <span class="icon-emoji">🕹️</span></label>
+                            <select id="sel-arcade" class="w-full bg-neutral-50 border border-neutral-300 text-neutral-900 text-sm rounded-lg focus:ring-brand-500 focus:border-brand-500 block p-3 transition-colors outline-none">
+                                <option value="fun_factory">Fun Factory Park (High Energy, Rides & Games)</option>
+                                <option value="uptown_la">Uptown LA (Bowling & Retro Arcade)</option>
+                                <option value="transporter">Transporter VR (Immersive, Unique Experience)</option>
+                                <option value="super_space">Super Space (Laser Tag & Active Fun)</option>
+                            </select>
+                        </div>
+
+                        <div>
+                            <label class="block text-sm font-semibold text-neutral-700 mb-2">2:30 PM - Late Lunch & Wrap Up <span class="icon-emoji">🍝</span></label>
+                            <select id="sel-afternoon" class="w-full bg-neutral-50 border border-neutral-300 text-neutral-900 text-sm rounded-lg focus:ring-brand-500 focus:border-brand-500 block p-3 transition-colors outline-none">
+                                <option value="mall_food">Mall Food Court/Restaurants (Convenient)</option>
+                                <option value="mm_alam">Drive to MM Alam Road (Upscale Dining)</option>
+                                <option value="dessert">Just Dessert at Sweet Tooth / Arcadian (Light finish)</option>
+                            </select>
+                        </div>
+
+                        <button id="btn-generate" class="w-full bg-brand-600 hover:bg-brand-700 text-white font-bold py-3 px-4 rounded-xl transition-all transform active:scale-95 mt-4 shadow-md">
+                            Generate Itinerary
+                        </button>
+                    </div>
+
+                    <!-- Generated Result -->
+                    <div id="itinerary-result" class="bg-white p-6 rounded-2xl shadow-lg border-2 border-brand-200 relative overflow-hidden transition-all duration-300">
+                        <!-- Decorative top bar -->
+                        <div class="absolute top-0 left-0 w-full h-2 bg-brand-400"></div>
+                        
+                        <div class="text-center mt-4 mb-6">
+                            <h3 class="font-serif text-2xl font-bold text-neutral-900">Your Perfect Day Date</h3>
+                            <p class="text-sm text-neutral-500 mt-1" id="total-budget-display">Est. Total Budget: PKR 0</p>
+                        </div>
+
+                        <div class="space-y-6 relative before:absolute before:inset-0 before:ml-5 before:-translate-x-px md:before:mx-auto md:before:translate-x-0 before:h-full before:w-0.5 before:bg-gradient-to-b before:from-brand-100 before:via-brand-300 before:to-brand-100 hidden" id="timeline-container">
+                            <!-- Timeline steps will be injected here -->
+                        </div>
+                        
+                        <div id="empty-state" class="text-center text-neutral-400 py-12">
+                            <span class="text-5xl icon-emoji block mb-4 opacity-50">✨</span>
+                            <p>Select your options and click generate to build your timeline.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section: Alternative Ideas -->
+        <section id="alternatives" class="scroll-mt-24 mb-20">
+            <div class="mb-10">
+                <h2 class="text-3xl font-serif font-bold text-neutral-900 mb-4">If You Change Your Mind...</h2>
+                <p class="text-neutral-600">Arcades are loud. If you decide you want something a bit more serene or culturally enriching between 9 AM and 4 PM, here are top alternatives.</p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div class="bg-white p-6 rounded-2xl border border-neutral-200 hover:shadow-md transition-shadow">
+                    <div class="text-4xl icon-emoji mb-4">🏛️</div>
+                    <h3 class="font-bold text-xl mb-2">Lahore Fort & Badshahi Mosque</h3>
+                    <p class="text-sm text-neutral-600 mb-4">Perfect for a 9 AM start before the sun gets too hot. Incredible architecture, great for taking beautiful photos of her.</p>
+                    <span class="inline-block bg-neutral-100 text-neutral-700 text-xs px-2 py-1 rounded">Budget: Low (Entry fees ~Rs. 100)</span>
+                </div>
+                
+                <div class="bg-white p-6 rounded-2xl border border-neutral-200 hover:shadow-md transition-shadow">
+                    <div class="text-4xl icon-emoji mb-4">🦁</div>
+                    <h3 class="font-bold text-xl mb-2">Lahore Safari Zoo Drive</h3>
+                    <p class="text-sm text-neutral-600 mb-4">A bit further out (Raiwind Road), but doing the drive-through safari in the morning is a very unique date experience.</p>
+                    <span class="inline-block bg-neutral-100 text-neutral-700 text-xs px-2 py-1 rounded">Budget: Medium (Rs. 2000+)</span>
+                </div>
+
+                <div class="bg-white p-6 rounded-2xl border border-neutral-200 hover:shadow-md transition-shadow">
+                    <div class="text-4xl icon-emoji mb-4">🎬</div>
+                    <h3 class="font-bold text-xl mb-2">Morning Matinee (Cinepax/Cue)</h3>
+                    <p class="text-sm text-neutral-600 mb-4">Catch a 12 PM movie show. It's cool, quiet, and gives you plenty to talk about at lunch afterwards.</p>
+                    <span class="inline-block bg-neutral-100 text-neutral-700 text-xs px-2 py-1 rounded">Budget: Medium (Rs. 3000 for two)</span>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <footer class="bg-neutral-900 text-neutral-400 py-12 text-center border-t border-neutral-800">
+        <div class="max-w-4xl mx-auto px-4">
+            <span class="text-3xl icon-emoji mb-4 block">💌</span>
+            <p class="mb-4 text-neutral-300">"The best dates are about the company, not just the destination."</p>
+            <p class="text-sm">Created with care for your perfect day in Lahore.</p>
+        </div>
+    </footer>
+
+    <!-- Application Logic -->
+    <script>
+        // --- Data Storage ---
+        const arcadeData = [
+            {
+                id: 'fun_factory',
+                name: 'Fun Factory Park',
+                location: 'Packages Mall, Walton Road',
+                vibe: 'High Energy, Huge Variety, Rides & Arcade',
+                bestFor: 'Couples who want to act like kids again. Huge selection of redemption games and indoor rides.',
+                budgetMin: 4000,
+                budgetMax: 8000,
+                lat: '31.4755',
+                lng: '74.3451',
+                link: 'https://packagesmall.com/directory/fun-factory/',
+                icon: '🎢'
+            },
+            {
+                id: 'uptown_la',
+                name: 'Uptown LA',
+                location: 'Fortress Square Mall, Cantt',
+                vibe: 'Neon, Bowling, Classic Arcade',
+                bestFor: 'A slightly more "grown-up" arcade feel. Great bowling alleys mixed with classic arcade machines.',
+                budgetMin: 3500,
+                budgetMax: 7000,
+                lat: '31.5303',
+                lng: '74.3850',
+                link: 'https://fortresssquare.com/entertainment/',
+                icon: '🎳'
+            },
+            {
+                id: 'transporter',
+                name: 'Transporter Virtual Reality',
+                location: 'Gulberg III',
+                vibe: 'Futuristic, Intimate, Immersive',
+                bestFor: 'Couples looking for something different. You wear VR headsets and play co-op games together.',
+                budgetMin: 5000,
+                budgetMax: 9000,
+                lat: '31.5126',
+                lng: '74.3486',
+                link: 'https://www.facebook.com/TransporterVR/',
+                icon: '🥽'
+            },
+            {
+                id: 'super_space',
+                name: 'Super Space',
+                location: 'Fortress Square Mall, Cantt',
+                vibe: 'Laser Tag, Dodging Cars, Active',
+                bestFor: 'Competitive couples. Challenge her to laser tag or bumping cars for a highly active date.',
+                budgetMin: 3000,
+                budgetMax: 6000,
+                lat: '31.5310',
+                lng: '74.3855',
+                link: 'https://superspace.pk/',
+                icon: '🔫'
+            }
+        ];
+
+        const morningData = {
+            english_tea: { name: 'English Tea House', cost: 4000, desc: 'Classic romantic vibe, great eggs benedict and pancakes.' },
+            rinas: { name: "Rina's Kitchenette", cost: 5000, desc: 'Modern, aesthetic interior with premium brunch options.' },
+            jilani: { name: 'Jilani Park & Local Chai', cost: 1000, desc: 'A beautiful morning walk among flowers, followed by casual tea.' }
+        };
+
+        const afternoonData = {
+            mall_food: { name: 'Mall Food Court', cost: 3000, desc: 'Quick, easy, and right next to the arcade.' },
+            mm_alam: { name: 'MM Alam Road Dining', cost: 7000, desc: 'Drive to a high-end restaurant to wrap up the date in style.' },
+            dessert: { name: 'Dessert Spot', cost: 2500, desc: 'Keep it light with gourmet ice cream or molten lava cake.' }
+        };
+
+        // --- Core Functions ---
+
+        // 1. Render Arcade Cards
+        function renderArcadeCards() {
+            const grid = document.getElementById('arcade-grid');
+            arcadeData.forEach(arcade => {
+                const card = document.createElement('div');
+                card.className = 'bg-white rounded-2xl p-6 border border-neutral-200 shadow-sm hover:shadow-lg transition-all duration-300 group';
+                card.innerHTML = `
+                    <div class="flex items-start justify-between mb-4">
+                        <div class="flex items-center gap-3">
+                            <span class="text-4xl icon-emoji bg-brand-50 p-2 rounded-xl group-hover:scale-110 transition-transform">${arcade.icon}</span>
+                            <div>
+                                <h3 class="font-bold text-xl text-neutral-900">${arcade.name}</h3>
+                                <p class="text-sm text-neutral-500"><span class="icon-emoji">📍</span> ${arcade.location}</p>
+                            </div>
+                        </div>
+                    </div>
+                    <p class="text-neutral-700 text-sm mb-4"><strong>Vibe:</strong> ${arcade.vibe}</p>
+                    <p class="text-neutral-600 text-sm italic mb-4">"${arcade.bestFor}"</p>
+                    
+                    <div class="hidden overflow-hidden transition-all duration-500 ease-in-out" id="details-${arcade.id}">
+                        <div class="pt-4 border-t border-neutral-100 mt-2 space-y-3">
+                            <div class="flex justify-between items-center bg-neutral-50 p-3 rounded-lg">
+                                <span class="text-sm font-semibold text-neutral-700">Est. Budget (For Two):</span>
+                                <span class="text-sm font-bold text-brand-600">PKR ${arcade.budgetMin.toLocaleString()} - ${arcade.budgetMax.toLocaleString()}</span>
+                            </div>
+                            <div class="flex gap-2">
+                                <a href="https://maps.google.com/?q=${arcade.lat},${arcade.lng}" target="_blank" class="flex-1 bg-neutral-800 hover:bg-neutral-900 text-white text-center text-sm py-2 rounded-lg transition-colors">
+                                    <span class="icon-emoji">🗺️</span> Open Map
+                                </a>
+                                <a href="${arcade.link}" target="_blank" class="flex-1 bg-brand-100 hover:bg-brand-200 text-brand-800 text-center text-sm py-2 rounded-lg transition-colors">
+                                    <span class="icon-emoji">🌐</span> Website
+                                </a>
+                            </div>
+                            <p class="text-xs text-neutral-400 text-center">GPS: ${arcade.lat}, ${arcade.lng}</p>
+                        </div>
+                    </div>
+                    
+                    <button onclick="toggleDetails('${arcade.id}')" class="w-full mt-2 text-brand-600 font-semibold text-sm hover:text-brand-700 flex justify-center items-center gap-1">
+                        <span id="btn-text-${arcade.id}">Reveal Details & Budget</span>
+                        <span class="icon-emoji text-xs" id="btn-icon-${arcade.id}">🔽</span>
+                    </button>
+                `;
+                grid.appendChild(card);
+            });
+        }
+
+        // Toggle visibility of arcade details
+        window.toggleDetails = function(id) {
+            const detailsDiv = document.getElementById(`details-${id}`);
+            const btnText = document.getElementById(`btn-text-${id}`);
+            const btnIcon = document.getElementById(`btn-icon-${id}`);
+            
+            if (detailsDiv.classList.contains('hidden')) {
+                detailsDiv.classList.remove('hidden');
+                btnText.innerText = 'Hide Details';
+                btnIcon.innerText = '🔼';
+            } else {
+                detailsDiv.classList.add('hidden');
+                btnText.innerText = 'Reveal Details & Budget';
+                btnIcon.innerText = '🔽';
+            }
+        };
+
+        // 2. Initialize Chart.js
+        function initChart() {
+            const ctx = document.getElementById('budgetChart').getContext('2d');
+            
+            const labels = arcadeData.map(a => a.name);
+            const minBudgets = arcadeData.map(a => a.budgetMin);
+            const maxBudgets = arcadeData.map(a => a.budgetMax);
+
+            new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: labels,
+                    datasets: [
+                        {
+                            label: 'Minimum Est. Spend (PKR)',
+                            data: minBudgets,
+                            backgroundColor: '#fda4af', // brand-300
+                            borderRadius: 4,
+                        },
+                        {
+                            label: 'Maximum Est. Spend (PKR)',
+                            data: maxBudgets,
+                            backgroundColor: '#e11d48', // brand-600
+                            borderRadius: 4,
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false, // CRITICAL: allows chart container to dictate height
+                    plugins: {
+                        legend: {
+                            position: 'top',
+                            labels: {
+                                font: { family: 'system-ui', size: 13 }
+                            }
+                        },
+                        tooltip: {
+                            backgroundColor: '#292524',
+                            titleFont: { size: 14, family: 'system-ui' },
+                            bodyFont: { size: 13, family: 'system-ui' },
+                            padding: 12,
+                            cornerRadius: 8,
+                            callbacks: {
+                                label: function(context) {
+                                    let label = context.dataset.label || '';
+                                    if (label) { label += ': '; }
+                                    if (context.parsed.y !== null) {
+                                        label += 'PKR ' + context.parsed.y.toLocaleString();
+                                    }
+                                    return label;
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            grid: { color: '#f5f5f4' },
+                            ticks: {
+                                callback: function(value) {
+                                    return 'Rs ' + value;
+                                }
+                            }
+                        },
+                        x: {
+                            grid: { display: false },
+                            ticks: {
+                                // 16-char wrapping logic required by prompt
+                                callback: function(value) {
+                                    const label = this.getLabelForValue(value);
+                                    if (label.length > 16) {
+                                        let splitLabel = [];
+                                        let line = '';
+                                        let words = label.split(' ');
+                                        for(let n = 0; n < words.length; n++) {
+                                            let testLine = line + words[n] + ' ';
+                                            if (testLine.length > 16 && n > 0) {
+                                                splitLabel.push(line);
+                                                line = words[n] + ' ';
+                                            } else {
+                                                line = testLine;
+                                            }
+                                        }
+                                        splitLabel.push(line);
+                                        return splitLabel;
+                                    }
+                                    return label;
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        // 3. Itinerary Builder Logic
+        function generateItinerary() {
+            const mKey = document.getElementById('sel-morning').value;
+            const aKey = document.getElementById('sel-arcade').value;
+            const aftKey = document.getElementById('sel-afternoon').value;
+
+            const morning = morningData[mKey];
+            const arcade = arcadeData.find(a => a.id === aKey);
+            const afternoon = afternoonData[aftKey];
+
+            // Calculate budget (using average of min/max for arcade)
+            const arcadeAvgCost = (arcade.budgetMin + arcade.budgetMax) / 2;
+            const totalBudget = morning.cost + arcadeAvgCost + afternoon.cost;
+
+            // Update UI
+            document.getElementById('empty-state').classList.add('hidden');
+            const timelineContainer = document.getElementById('timeline-container');
+            timelineContainer.classList.remove('hidden');
+
+            document.getElementById('total-budget-display').innerHTML = `
+                Est. Total Budget (For Two): <strong class="text-brand-600 text-lg">PKR ${totalBudget.toLocaleString()}</strong>
+            `;
+
+            timelineContainer.innerHTML = `
+                <!-- Step 1 -->
+                <div class="relative flex items-center justify-between md:justify-normal md:odd:flex-row-reverse group is-active">
+                    <div class="flex items-center justify-center w-10 h-10 rounded-full border-4 border-white bg-brand-100 text-brand-600 shadow shrink-0 md:order-1 md:group-odd:-translate-x-1/2 md:group-even:translate-x-1/2 z-10 text-lg">
+                        ☕
+                    </div>
+                    <div class="w-[calc(100%-4rem)] md:w-[calc(50%-2.5rem)] p-4 rounded-xl border border-neutral-100 bg-neutral-50 shadow-sm">
+                        <div class="flex items-center justify-between mb-1">
+                            <div class="font-bold text-neutral-900 text-lg">9:00 AM</div>
+                            <div class="text-xs font-medium text-brand-600 bg-brand-100 px-2 py-1 rounded">Start</div>
+                        </div>
+                        <div class="font-semibold text-neutral-800 mb-1">${morning.name}</div>
+                        <div class="text-neutral-600 text-sm">${morning.desc}</div>
+                        <div class="text-xs text-neutral-400 mt-2">Est: PKR ${morning.cost}</div>
+                    </div>
+                </div>
+
+                <!-- Step 2 -->
+                <div class="relative flex items-center justify-between md:justify-normal md:odd:flex-row-reverse group is-active">
+                    <div class="flex items-center justify-center w-10 h-10 rounded-full border-4 border-white bg-brand-500 text-white shadow shrink-0 md:order-1 md:group-odd:-translate-x-1/2 md:group-even:translate-x-1/2 z-10 text-lg">
+                        ${arcade.icon}
+                    </div>
+                    <div class="w-[calc(100%-4rem)] md:w-[calc(50%-2.5rem)] p-4 rounded-xl border border-brand-200 bg-white shadow-md transform transition-transform hover:scale-105">
+                        <div class="flex items-center justify-between mb-1">
+                            <div class="font-bold text-brand-600 text-lg">11:30 AM</div>
+                            <div class="text-xs font-medium text-white bg-brand-500 px-2 py-1 rounded shadow-sm">Main Event</div>
+                        </div>
+                        <div class="font-semibold text-neutral-900 mb-1">${arcade.name}</div>
+                        <div class="text-neutral-600 text-sm mb-2">${arcade.vibe}</div>
+                        <a href="https://maps.google.com/?q=${arcade.lat},${arcade.lng}" target="_blank" class="inline-block text-xs text-brand-600 hover:underline mb-2">📍 Navigate to Mall</a>
+                        <div class="text-xs text-neutral-400">Est: PKR ${arcadeAvgCost.toLocaleString()}</div>
+                    </div>
+                </div>
+
+                <!-- Step 3 -->
+                <div class="relative flex items-center justify-between md:justify-normal md:odd:flex-row-reverse group is-active">
+                    <div class="flex items-center justify-center w-10 h-10 rounded-full border-4 border-white bg-neutral-200 text-neutral-600 shadow shrink-0 md:order-1 md:group-odd:-translate-x-1/2 md:group-even:translate-x-1/2 z-10 text-lg">
+                        🍽️
+                    </div>
+                    <div class="w-[calc(100%-4rem)] md:w-[calc(50%-2.5rem)] p-4 rounded-xl border border-neutral-100 bg-neutral-50 shadow-sm">
+                        <div class="flex items-center justify-between mb-1">
+                            <div class="font-bold text-neutral-900 text-lg">2:30 PM</div>
+                            <div class="text-xs font-medium text-neutral-500 bg-neutral-200 px-2 py-1 rounded">Wrap Up</div>
+                        </div>
+                        <div class="font-semibold text-neutral-800 mb-1">${afternoon.name}</div>
+                        <div class="text-neutral-600 text-sm">${afternoon.desc}</div>
+                        <div class="text-xs text-neutral-400 mt-2">Est: PKR ${afternoon.cost}</div>
+                    </div>
+                </div>
+            `;
+            
+            // Scroll to result smoothly
+            document.getElementById('itinerary-result').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        }
+
+        // --- Initialization ---
+        document.addEventListener('DOMContentLoaded', () => {
+            renderArcadeCards();
+            initChart();
+            
+            document.getElementById('btn-generate').addEventListener('click', generateItinerary);
+        });
+
+    </script>
+</body>
+</html>
